@@ -1,0 +1,10 @@
+{
+    "id": "archielite/log-viewer",
+    "name": "Log Viewer",
+    "namespace": "ArchiElite\\LogViewer\\",
+    "provider": "ArchiElite\\LogViewer\\Providers\\LogViewerServiceProvider",
+    "author": "Archi Elite",
+    "url": "https://archielite.com",
+    "version": "1.0.0",
+    "description": "Fast and beautiful Log Viewer for Botble CMS."
+}
