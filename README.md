@@ -3,7 +3,7 @@
 Log Viewer is a plugin for Botble CMS allowing you to easily read, search and manage your Laravel logs. You will no longer
 need to read the raw Laravel log files trying to find what you're looking for.
 
-![Log Viewer](https://github-production-user-asset-6210df.s3.amazonaws.com/114894084/252555117-2a64f79c-8d8d-48eb-981d-95b6a7fb8cbb.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20230711%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20230711T045617Z&X-Amz-Expires=300&X-Amz-Signature=c1447a7616bbccb9cb90769cc1ef428fc2fc10517d84658f5ee3a7939f8b069e&X-Amz-SignedHeaders=host&actor_id=114894084&key_id=0&repo_id=664931244)
+![log-viewer-light-dark](https://user-images.githubusercontent.com/8697942/186705175-d51db6ef-1615-4f94-aa1e-3ecbcb29ea24.png)
 
 ## Installation
 
