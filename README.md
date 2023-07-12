@@ -1,5 +1,7 @@
 # Log Viewer Plus for Botble CMS
 
+This plugin will convert package https://github.com/opcodesio/log-viewer to Botble plugin. Thanks OPcodes team.
+
 Log Viewer Plus is a plugin for Botble CMS allowing you to easily read, search and manage your Laravel logs. You will no longer
 need to read the raw Laravel log files trying to find what you're looking for.
 
