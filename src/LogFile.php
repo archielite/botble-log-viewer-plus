@@ -20,7 +20,7 @@ class LogFile
 
     public string $subFolder = '';
 
-    private array $_logIndexCache;
+    private array $logIndexCache;
 
     public function __construct(string $path)
     {
@@ -36,11 +36,11 @@ class LogFile
 
     public function index(string $query = null): LogIndex
     {
-        if (! isset($this->_logIndexCache[$query])) {
-            $this->_logIndexCache[$query] = new LogIndex($this, $query);
+        if (! isset($this->logIndexCache[$query])) {
+            $this->logIndexCache[$query] = new LogIndex($this, $query);
         }
 
-        return $this->_logIndexCache[$query];
+        return $this->logIndexCache[$query];
     }
 
     public function logs(): LogReader

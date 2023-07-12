@@ -12,7 +12,7 @@ need to read the raw Laravel log files trying to find what you're looking for.
 Here are the requirements for installing and using the Log Viewer plugin:
 
 - PHP 8.0 or higher
-- Botble core 6.8 or higher
+- Botble core 6.5.1 or higher
 
 ### Installing via Admin Panel
 

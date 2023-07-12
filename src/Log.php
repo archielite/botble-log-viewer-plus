@@ -136,16 +136,16 @@ class Log
             return;
         }
 
-        foreach ($matches[0] as $json_string) {
-            $json_data = json_decode($json_string, true);
+        foreach ($matches[0] as $jsonString) {
+            $json_data = json_decode($jsonString, true);
 
             if (json_last_error() == JSON_ERROR_CTRL_CHAR) {
-                $json_data = json_decode(str_replace("\n", '\\n', $json_string), true);
+                $json_data = json_decode(str_replace("\n", '\\n', $jsonString), true);
             }
 
             if (json_last_error() == JSON_ERROR_NONE) {
                 $this->contexts[] = $json_data;
-                $this->fullText = str_replace($json_string, '', $this->fullText);
+                $this->fullText = str_replace($jsonString, '', $this->fullText);
             }
         }
     }

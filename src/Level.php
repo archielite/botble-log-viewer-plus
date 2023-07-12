@@ -2,7 +2,23 @@
 
 namespace ArchiElite\LogViewer;
 
-class Level
+use Botble\Base\Supports\Enum;
+
+/**
+ * @method static \ArchiElite\LogViewer\Level Debug()
+ * @method static \ArchiElite\LogViewer\Level Info()
+ * @method static \ArchiElite\LogViewer\Level Notice()
+ * @method static \ArchiElite\LogViewer\Level Warning()
+ * @method static \ArchiElite\LogViewer\Level Error()
+ * @method static \ArchiElite\LogViewer\Level Critical()
+ * @method static \ArchiElite\LogViewer\Level Alert()
+ * @method static \ArchiElite\LogViewer\Level Emergency()
+ * @method static \ArchiElite\LogViewer\Level Processing()
+ * @method static \ArchiElite\LogViewer\Level Processed()
+ * @method static \ArchiElite\LogViewer\Level Failed()
+ * @method static \ArchiElite\LogViewer\Level None()
+ */
+class Level extends Enum
 {
     public const Debug = 'debug';
 
@@ -28,7 +44,7 @@ class Level
 
     public const None = '';
 
-    public string $value;
+    public mixed $value;
 
     public function __construct(string $value = null)
     {

@@ -2,17 +2,12 @@
 
 namespace ArchiElite\LogViewer\Http\Resources;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 
 class LogFileResource extends JsonResource
 {
-    /**
-     * @param  Request  $request
-     * @return array
-     */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             'identifier' => $this->identifier,
@@ -26,10 +21,8 @@ class LogFileResource extends JsonResource
             'download_url' => $this->downloadUrl(),
             'earliest_timestamp' => $this->earliestTimestamp(),
             'latest_timestamp' => $this->latestTimestamp(),
-
             'can_download' => Auth::user()->hasPermission('log-viewer.index'),
             'can_delete' => Auth::user()->hasPermission('log-viewer.destroy'),
-
             'loading' => false, // helper for frontend
             'selected_for_deletion' => false, // helper for frontend
         ];
