@@ -5,10 +5,11 @@ use ArchiElite\LogViewer\Http\Controllers\FolderController;
 use ArchiElite\LogViewer\Http\Controllers\HostController;
 use ArchiElite\LogViewer\Http\Controllers\LogController;
 use ArchiElite\LogViewer\Http\Middleware\ForwardRequestToHostMiddleware;
+use Botble\Base\Facades\BaseHelper;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(array_merge(['web', 'auth'], config('plugins.log-viewer-plus.log-viewer.api_middleware')))
-    ->prefix(config('plugins.log-viewer-plus.log-viewer.route_path') . '/api')
+    ->prefix(BaseHelper::getAdminPrefix(). '/' .config('plugins.log-viewer-plus.log-viewer.route_path') . '/api')
     ->name(config('plugins.log-viewer-plus.log-viewer.route_path') . '.')
     ->group(function () {
         Route::get('hosts', [HostController::class, 'index'])
