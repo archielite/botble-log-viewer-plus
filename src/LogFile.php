@@ -93,7 +93,7 @@ class LogFile
 
     public function getLastScannedFilePositionForQuery(?string $query = ''): ?int
     {
-        foreach ($this->getMetadata('related_indices', []) as $indexIdentifier => $indexMetadata) {
+        foreach ($this->getMetadata('related_indices', []) as $indexMetadata) {
             if ($query === $indexMetadata['query']) {
                 return $indexMetadata['last_scanned_file_position'] ?? 0;
             }

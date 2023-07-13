@@ -5,7 +5,6 @@ namespace ArchiElite\LogViewer\Http\Controllers;
 use ArchiElite\LogViewer\Facades\LogViewer;
 use ArchiElite\LogViewer\Http\Resources\LogFolderResource;
 use ArchiElite\LogViewer\LogFile;
-use ArchiElite\LogViewer\LogFolder;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Illuminate\Http\Request;
@@ -32,7 +31,6 @@ class FolderController extends BaseController
 
     public function download(string $folderIdentifier): BinaryFileResponse
     {
-        /** @var LogFolder $folder */
         $folder = LogViewer::getFolder($folderIdentifier);
 
         abort_if(is_null($folder), 404);

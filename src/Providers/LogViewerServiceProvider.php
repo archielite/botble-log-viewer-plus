@@ -3,7 +3,6 @@
 namespace ArchiElite\LogViewer\Providers;
 
 use ArchiElite\LogViewer\Commands\GenerateDummyLogsCommand;
-use ArchiElite\LogViewer\Commands\PublishCommand;
 use ArchiElite\LogViewer\LogViewerService;
 use Botble\Base\Facades\DashboardMenu;
 use Botble\Base\Supports\ServiceProvider;
@@ -35,7 +34,6 @@ class LogViewerServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
-                PublishCommand::class,
                 GenerateDummyLogsCommand::class,
             ]);
         }

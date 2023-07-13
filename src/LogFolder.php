@@ -119,7 +119,6 @@ class LogFolder
             throw new Exception("Could not open $zipPath for writing.");
         }
 
-        /** @var LogFile $file */
         foreach ($this->files() as $file) {
             if (! Auth::user()->hasPermission('log-viewer.download')) {
                 continue;

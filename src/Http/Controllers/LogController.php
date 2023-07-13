@@ -14,8 +14,6 @@ use Illuminate\Support\Str;
 
 class LogController extends BaseController
 {
-    public const OLDEST_FIRST = 'asc';
-
     public const NEWEST_FIRST = 'desc';
 
     public function index(Request $request)
@@ -23,14 +21,13 @@ class LogController extends BaseController
         $fileIdentifier = $request->query('file', '');
         $query = $request->query('query', '');
         $direction = $request->query('direction', 'desc');
-        $log = $request->query('log', null);
         $selectedLevels = $request->query('levels', Level::caseValues());
-        $perPage = $request->query('per_page', 25);
-        session()->put('log-viewer:shorter-stack-traces', $request->boolean('shorter_stack_traces', false));
+        $perPage = $request->integer('per_page', 25);
+        session()->put('log-viewer:shorter-stack-traces', $request->boolean('shorter_stack_traces'));
         $hasMoreResults = false;
         $percentScanned = 0;
 
-        if ($request->query('page', 1) < 1) {
+        if (! $request->integer('page', 1)) {
             $request->replace(['page' => 1]);
         }
 
@@ -66,8 +63,7 @@ class LogController extends BaseController
 
                 $hasMoreResults = $logQuery->requiresScan();
                 $percentScanned = $logQuery->percentScanned();
-            } catch (InvalidRegularExpression $exception) {
-                $queryError = $exception->getMessage();
+            } catch (InvalidRegularExpression) {
             }
         }
 
@@ -102,7 +98,7 @@ class LogController extends BaseController
     {
         $startTime = defined('LARAVEL_START') ? LARAVEL_START : request()->server('REQUEST_TIME_FLOAT');
         $memoryUsage = number_format(memory_get_peak_usage(true) / 1024 / 1024, 2) . ' MB';
-        $requestTime = number_format((microtime(true) - $startTime) * 1000, 0) . 'ms';
+        $requestTime = number_format((microtime(true) - $startTime) * 1000) . 'ms';
 
         return [
             'memoryUsage' => $memoryUsage,

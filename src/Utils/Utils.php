@@ -19,18 +19,6 @@ class Utils
         return "$bytes bytes";
     }
 
-    public static function sizeOfVar(mixed $var): int
-    {
-        $start_memory = memory_get_usage();
-
-        return memory_get_usage() - $start_memory;
-    }
-
-    public static function sizeOfVarInMB(mixed $var): string
-    {
-        return self::bytesForHumans(self::sizeOfVar($var));
-    }
-
     public static function validateRegex(string $regexString, bool $throw = true): bool
     {
         $error = null;

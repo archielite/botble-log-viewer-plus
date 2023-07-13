@@ -43,17 +43,6 @@
                 </div>
             </div>
 
-            <div
-                v-if="LogViewer.assets_outdated"
-                class="bg-yellow-100 dark:bg-yellow-900 bg-opacity-75 dark:bg-opacity-40 border border-yellow-300 dark:border-yellow-800 rounded-md px-2 py-1 mt-2 text-xs leading-5 text-yellow-700 dark:text-yellow-400"
-            >
-                <ExclamationTriangleIcon class="h-4 w-4 mr-1 inline" />
-                Front-end assets are outdated. To update, please run
-                <code class="font-mono px-2 py-1 bg-gray-100 dark:bg-gray-900 rounded">
-                    php artisan log-viewer:publish
-                </code>
-            </div>
-
             <template v-if="hostStore.supportsHosts && hostStore.hasRemoteHosts">
                 <host-selector class="mb-8 mt-6" />
             </template>

@@ -1,5 +1,7 @@
 <?php
 
+use ArchiElite\LogViewer\Http\Middleware\AuthorizeLogViewer;
+use ArchiElite\LogViewer\Http\Middleware\EnsureFrontendRequestsAreStateful;
 use ArchiElite\LogViewer\Level;
 
 return [
@@ -34,7 +36,7 @@ return [
 
     'middleware' => [
         'web',
-        \ArchiElite\LogViewer\Http\Middleware\AuthorizeLogViewer::class,
+        AuthorizeLogViewer::class,
     ],
 
     /*
@@ -47,8 +49,8 @@ return [
     */
 
     'api_middleware' => [
-        \ArchiElite\LogViewer\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-        \ArchiElite\LogViewer\Http\Middleware\AuthorizeLogViewer::class,
+        EnsureFrontendRequestsAreStateful::class,
+        AuthorizeLogViewer::class,
     ],
 
     /*

@@ -4,7 +4,6 @@ namespace ArchiElite\LogViewer\Http\Controllers;
 
 use ArchiElite\LogViewer\Facades\LogViewer;
 use ArchiElite\LogViewer\Http\Resources\LogFileResource;
-use ArchiElite\LogViewer\LogFile;
 use Botble\Base\Http\Controllers\BaseController;
 use Botble\Base\Http\Responses\BaseHttpResponse;
 use Illuminate\Http\Request;
@@ -31,7 +30,6 @@ class FileController extends BaseController
 
     public function download(string $fileIdentifier): BinaryFileResponse
     {
-        /** @var LogFile $file */
         $file = LogViewer::getFile($fileIdentifier);
 
         abort_if(is_null($file), 404);
@@ -41,7 +39,6 @@ class FileController extends BaseController
 
     public function clearCache(string $fileIdentifier, BaseHttpResponse $response): BaseHttpResponse
     {
-        /** @var LogFile $file */
         $file = LogViewer::getFile($fileIdentifier);
 
         abort_if(is_null($file), 404);
@@ -73,7 +70,7 @@ class FileController extends BaseController
 
     public function deleteMultipleFiles(Request $request, BaseHttpResponse $response): BaseHttpResponse
     {
-        $selectedFilesArray = $request->input('files', []);
+        $selectedFilesArray = (array)$request->input('files', []);
 
         foreach ($selectedFilesArray as $fileIdentifier) {
             $file = LogViewer::getFile($fileIdentifier);
