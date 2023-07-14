@@ -8,7 +8,7 @@ use ArchiElite\LogViewer\Http\Middleware\ForwardRequestToHostMiddleware;
 use Botble\Base\Facades\BaseHelper;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(array_merge(['web', 'auth'], config('plugins.log-viewer-plus.log-viewer.api_middleware')))
+Route::middleware(array_merge(['web', 'auth'], config('plugins.log-viewer-plus.log-viewer.api_middleware', [])))
     ->prefix(BaseHelper::getAdminPrefix(). '/' .config('plugins.log-viewer-plus.log-viewer.route_path') . '/api')
     ->name(config('plugins.log-viewer-plus.log-viewer.route_path') . '.')
     ->group(function () {
