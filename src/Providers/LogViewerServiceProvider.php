@@ -9,7 +9,6 @@ use Botble\Base\Supports\ServiceProvider;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
 use Illuminate\Routing\Events\RouteMatched;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Event;
 
 class LogViewerServiceProvider extends ServiceProvider
 {
@@ -38,7 +37,7 @@ class LogViewerServiceProvider extends ServiceProvider
             ]);
         }
 
-        Event::listen(RouteMatched::class, function () {
+        $this->app['events']->listen(RouteMatched::class, function () {
             DashboardMenu::registerItem([
                 'id' => 'cms-plugin-log-viewer',
                 'priority' => 7,
