@@ -62,7 +62,7 @@ class LogTypeRegistrar
 
             try {
                 $textOrFile = $textOrFile->getFirstLine();
-            } catch (CannotOpenFileException $exception) {
+            } catch (CannotOpenFileException) {
                 return null;
             }
         }
@@ -72,7 +72,7 @@ class LogTypeRegistrar
                 if ($class::matches($textOrFile)) {
                     return $type;
                 }
-            } catch (SkipLineException $exception) {
+            } catch (SkipLineException) {
                 // let's try the next 5 lines
                 if (isset($file)) {
                     foreach (range(1, 5) as $lineNumber) {
@@ -80,9 +80,9 @@ class LogTypeRegistrar
                             if ($class::matches($file->getNthLine($lineNumber))) {
                                 return $type;
                             }
-                        } catch (CannotOpenFileException $exception) {
+                        } catch (CannotOpenFileException) {
                             return null;
-                        } catch (SkipLineException $exception) {
+                        } catch (SkipLineException) {
                             continue;
                         }
                     }

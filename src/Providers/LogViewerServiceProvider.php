@@ -21,14 +21,10 @@ class LogViewerServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind('log-viewer', LogViewerService::class);
-        $this->app->bind('log-viewer-cache', function () {
-            return Cache::driver(config('plugins.log-viewer-plus.log-viewer.cache_driver'));
-        });
+        $this->app->bind('log-viewer-cache', fn () => Cache::driver(config('plugins.log-viewer-plus.log-viewer.cache_driver')));
 
         if (! $this->app->bound(LogTypeRegistrar::class)) {
-            $this->app->singleton(LogTypeRegistrar::class, function () {
-                return new LogTypeRegistrar();
-            });
+            $this->app->singleton(LogTypeRegistrar::class, fn () => new LogTypeRegistrar());
         }
     }
 

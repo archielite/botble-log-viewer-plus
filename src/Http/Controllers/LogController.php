@@ -40,9 +40,7 @@ class LogController extends BaseController
             $fileCollection = LogViewer::getFiles();
 
             if (! empty($excludedFileTypes)) {
-                $fileCollection = $fileCollection->filter(function ($file) use ($excludedFileTypes) {
-                    return ! in_array($file->type()->value, $excludedFileTypes);
-                })->values();
+                $fileCollection = $fileCollection->filter(fn ($file) => ! in_array($file->type()->value, $excludedFileTypes))->values();
             }
 
             $logQuery = $fileCollection->logs();

@@ -105,9 +105,7 @@ class LogViewerService
         }
 
         if (config('log-viewer.hide_unknown_files', true)) {
-            $this->_cachedFiles = $this->_cachedFiles->filter(function (LogFile $file) {
-                return ! $file->type()->isUnknown();
-            });
+            $this->_cachedFiles = $this->_cachedFiles->filter(fn (LogFile $file) => ! $file->type()->isUnknown());
         }
 
         return $this->_cachedFiles;
@@ -140,11 +138,9 @@ class LogViewerService
     public function getFolder(?string $folderIdentifier): ?LogFolder
     {
         return $this->getFilesGroupedByFolder()
-            ->first(function (LogFolder $folder) use ($folderIdentifier) {
-                return (empty($folderIdentifier) && $folder->isRoot())
-                    || $folder->identifier === $folderIdentifier
-                    || $folder->path === $folderIdentifier;
-            });
+            ->first(fn (LogFolder $folder) => (empty($folderIdentifier) && $folder->isRoot())
+                || $folder->identifier === $folderIdentifier
+                || $folder->path === $folderIdentifier);
     }
 
     public function supportsHostsFeature(): bool
@@ -166,11 +162,9 @@ class LogViewerService
                 call_user_func($this->hostsResolver, $hosts) ?? []
             );
 
-            $hosts->transform(function ($host, $key) {
-                return is_array($host)
-                    ? Host::fromConfig($key, $host)
-                    : $host;
-            });
+            $hosts->transform(fn ($host, $key) => is_array($host)
+                ? Host::fromConfig($key, $host)
+                : $host);
         }
 
         return $hosts->values();
@@ -279,7 +273,7 @@ class LogViewerService
         return Cache::remember('log-viewer-version', 60 * 60 * 24, function () {
             $content = File::get(plugin_path('log-viewer-plus/plugin.json'));
 
-            $content = json_decode($content, true);
+            $content = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
             return Arr::get($content, 'version');
         });

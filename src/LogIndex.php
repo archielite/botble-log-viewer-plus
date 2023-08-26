@@ -80,7 +80,7 @@ class LogIndex
     {
         $results = [];
         $itemsAdded = 0;
-        $limit = $limit ?? $this->limit;
+        $limit ??= $this->limit;
         $skip = $this->skip;
         $chunkDefinitions = $this->getChunkDefinitions();
 
@@ -162,7 +162,7 @@ class LogIndex
     {
         $results = [];
         $itemsAdded = 0;
-        $limit = $limit ?? $this->limit;
+        $limit ??= $this->limit;
         $skip = $this->skip;
         $chunkDefinitions = $this->getChunkDefinitions();
 
@@ -259,7 +259,7 @@ class LogIndex
                         $counts[$severity] = 0;
                     }
 
-                    $counts[$severity] += count($logIndex);
+                    $counts[$severity] += is_countable($logIndex) ? count($logIndex) : 0;
                 }
             }
         }

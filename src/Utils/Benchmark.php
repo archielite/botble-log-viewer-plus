@@ -50,14 +50,12 @@ class Benchmark
     {
         $history = static::$tests[$name]['history'];
 
-        return array_reduce($history, function ($sum, $historyEntry) {
-            return $sum + $historyEntry['duration'];
-        }, 0);
+        return array_reduce($history, fn ($sum, $historyEntry) => $sum + $historyEntry['duration'], 0);
     }
 
     public static function getAverage(string $name): float
     {
-        return static::getTotal($name) / count(static::$tests[$name]['history']);
+        return static::getTotal($name) / (is_countable(static::$tests[$name]['history']) ? count(static::$tests[$name]['history']) : 0);
     }
 
     public static function dd(string $name = null): void
@@ -87,7 +85,7 @@ class Benchmark
 
             return [
                 'name' => $name,
-                'number_of_runs' => count($testData['history']),
+                'number_of_runs' => is_countable($testData['history']) ? count($testData['history']) : 0,
                 'total' => number_format(static::getTotal($name), 6),
                 'average' => number_format(static::getAverage($name), 6),
             ];
@@ -98,7 +96,7 @@ class Benchmark
         foreach (static::$tests as $testName => $testData) {
             $results[] = [
                 'name' => $testName,
-                'number_of_runs' => count($testData['history']),
+                'number_of_runs' => is_countable($testData['history']) ? count($testData['history']) : 0,
                 'total' => number_format(static::getTotal($testName), 6),
                 'average' => number_format(static::getAverage($testName), 6),
             ];

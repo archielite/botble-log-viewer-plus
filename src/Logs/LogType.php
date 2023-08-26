@@ -4,7 +4,7 @@ namespace ArchiElite\LogViewer\Logs;
 
 use ArchiElite\LogViewer\LogTypeRegistrar;
 
-class LogType
+class LogType implements \Stringable
 {
     public const DEFAULT = 'log';
 

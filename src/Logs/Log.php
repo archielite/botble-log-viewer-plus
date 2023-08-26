@@ -47,18 +47,9 @@ class Log
 
     public array $extra = [];
 
-    public ?string $fileIdentifier;
-
-    public ?int $filePosition;
-
-    public ?int $index;
-
-    public function __construct(string $text, string $fileIdentifier = null, int $filePosition = null, int $index = null)
+    public function __construct(string $text, public ?string $fileIdentifier = null, public ?int $filePosition = null, public ?int $index = null)
     {
         $this->text = rtrim($text);
-        $this->fileIdentifier = $fileIdentifier;
-        $this->filePosition = $filePosition;
-        $this->index = $index;
 
         $matches = [];
         $this->parseText($matches);
@@ -76,7 +67,7 @@ class Log
             try {
                 $timestamp = static::parseDateTime($matches[static::$regexDatetimeKey] ?? null)?->timestamp;
                 $level = $matches[static::$regexLevelKey] ?? '';
-            } catch (\Exception $exception) {
+            } catch (\Exception) {
                 // not a valid datetime, so we can't match this log. Perhaps it's a different but similar log type.
                 return false;
             }

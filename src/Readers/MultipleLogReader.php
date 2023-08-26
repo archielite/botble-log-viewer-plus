@@ -121,9 +121,7 @@ class MultipleLogReader
 
     public function total(): int
     {
-        return $this->fileCollection->sum(function (LogFile $file) {
-            return $this->getLogQueryForFile($file)->total();
-        });
+        return $this->fileCollection->sum(fn (LogFile $file) => $this->getLogQueryForFile($file)->total());
     }
 
     public function paginate($perPage = 25, int $page = null): LengthAwarePaginator
@@ -148,7 +146,7 @@ class MultipleLogReader
     public function get(int $limit = null): array
     {
         $skip = $this->skip ?? null;
-        $limit = $limit ?? $this->limit ?? null;
+        $limit ??= $this->limit ?? null;
         $logs = [];
 
         /** @var LogFile $file */
@@ -180,9 +178,7 @@ class MultipleLogReader
 
     public function requiresScan(): bool
     {
-        return $this->fileCollection->some(function (LogFile $file) {
-            return $this->getLogQueryForFile($file)->requiresScan();
-        });
+        return $this->fileCollection->some(fn (LogFile $file) => $this->getLogQueryForFile($file)->requiresScan());
     }
 
     public function percentScanned(): int
@@ -194,9 +190,7 @@ class MultipleLogReader
             return 100;
         }
 
-        $missingScansBytes = $this->fileCollection->sum(function (LogFile $file) {
-            return $this->getLogQueryForFile($file)->numberOfNewBytes();
-        });
+        $missingScansBytes = $this->fileCollection->sum(fn (LogFile $file) => $this->getLogQueryForFile($file)->numberOfNewBytes());
 
         return 100 - intval($missingScansBytes / $totalFileBytes * 100);
     }
@@ -218,7 +212,7 @@ class MultipleLogReader
 
             try {
                 $logQuery->scan($maxBytesToScan, $force);
-            } catch (CannotOpenFileException $exception) {
+            } catch (CannotOpenFileException) {
                 continue;
             }
 

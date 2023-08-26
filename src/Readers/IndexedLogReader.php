@@ -89,7 +89,7 @@ class IndexedLogReader extends BaseLogReader implements LogReaderInterface
 
             try {
                 $lineMatches = $this->logClass::matches(trim($line), $ts, $lvl);
-            } catch (SkipLineException $exception) {
+            } catch (SkipLineException) {
                 continue;
             }
 
@@ -153,13 +153,11 @@ class IndexedLogReader extends BaseLogReader implements LogReaderInterface
         $this->prepareFileForReading();
         $levelClass = $this->logClass::levelClass();
 
-        return $this->index()->getLevelCounts()->map(function (int $count, string $level) {
-            return new LevelCount(
-                $this->levelClass::from($level),
-                $count,
-                $this->index()->isLevelSelected($level),
-            );
-        })->sortBy(fn (LevelCount $levelCount) => $levelCount->level->getName(), SORT_NATURAL)->toArray();
+        return $this->index()->getLevelCounts()->map(fn (int $count, string $level) => new LevelCount(
+            $this->levelClass::from($level),
+            $count,
+            $this->index()->isLevelSelected($level),
+        ))->sortBy(fn (LevelCount $levelCount) => $levelCount->level->getName(), SORT_NATURAL)->toArray();
     }
 
     public function get(int $limit = null): array
