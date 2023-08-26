@@ -109,6 +109,7 @@ class LogIndex
                 if (isset($this->filterFrom) && $timestamp < $this->filterFrom) {
                     continue;
                 }
+
                 if (isset($this->filterTo) && $timestamp > $this->filterTo) {
                     continue;
                 }
@@ -132,7 +133,7 @@ class LogIndex
 
                     foreach ($levelIndex as $idx => $position) {
                         if ($skip > 0) {
-                            $skip--;
+                            --$skip;
 
                             continue;
                         }
@@ -191,6 +192,7 @@ class LogIndex
                 if (isset($this->filterFrom) && $timestamp < $this->filterFrom) {
                     continue;
                 }
+
                 if (isset($this->filterTo) && $timestamp > $this->filterTo) {
                     continue;
                 }
@@ -211,7 +213,7 @@ class LogIndex
 
                 foreach ($itemsWithinThisTimestamp as $idx => $filePosition) {
                     if ($skip > 0) {
-                        $skip--;
+                        --$skip;
 
                         continue;
                     }

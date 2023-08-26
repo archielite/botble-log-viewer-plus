@@ -100,7 +100,7 @@ class IndexedLogReader extends BaseLogReader implements LogReaderInterface
                     }
 
                     $currentLog = '';
-                    $currentIndex++;
+                    ++$currentIndex;
                 }
 
                 $currentTimestamp = $ts;
@@ -118,7 +118,7 @@ class IndexedLogReader extends BaseLogReader implements LogReaderInterface
         if ($currentLog !== '' && $this->logClass::matches($currentLog)) {
             if ((is_null($this->query) || preg_match($this->query, $currentLog))) {
                 $logIndex->addToIndex($currentLogPosition, $currentTimestamp ?? 0, $currentLogLevel, $currentIndex);
-                $currentIndex++;
+                ++$currentIndex;
             }
         }
 
@@ -157,7 +157,7 @@ class IndexedLogReader extends BaseLogReader implements LogReaderInterface
             $this->levelClass::from($level),
             $count,
             $this->index()->isLevelSelected($level),
-        ))->sortBy(fn (LevelCount $levelCount) => $levelCount->level->getName(), SORT_NATURAL)->toArray();
+        ))->sortBy(static fn(LevelCount $levelCount) => $levelCount->level->getName(), SORT_NATURAL)->toArray();
     }
 
     public function get(int $limit = null): array
