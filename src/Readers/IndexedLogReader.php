@@ -151,7 +151,7 @@ class IndexedLogReader extends BaseLogReader implements LogReaderInterface
     public function getLevelCounts(): array
     {
         $this->prepareFileForReading();
-        $levelClass = $this->logClass::levelClass();
+        $this->logClass::levelClass();
 
         return $this->index()->getLevelCounts()->map(fn (int $count, string $level) => new LevelCount(
             $this->levelClass::from($level),

@@ -253,7 +253,7 @@ class LogIndex
                 }
             }
         } else {
-            foreach ($this->get() as $timestamp => $tsIndex) {
+            foreach ($this->get() as $tsIndex) {
                 foreach ($tsIndex as $severity => $logIndex) {
                     if (! $counts->has($severity)) {
                         $counts[$severity] = 0;

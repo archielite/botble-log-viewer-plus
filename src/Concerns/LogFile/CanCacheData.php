@@ -34,7 +34,7 @@ trait CanCacheData
     {
         $size = 0;
 
-        foreach ($this->getMetadata('related_indices', []) as $indexIdentifier => $indexMetadata) {
+        foreach ($this->getMetadata('related_indices', []) as $indexMetadata) {
             $size += $this->index($indexMetadata['query'])->cacheSize();
         }
 
@@ -45,9 +45,7 @@ trait CanCacheData
         $size += strlen(serialize(Cache::get($this->metadataCacheKey())));
         $size += strlen(serialize(Cache::get($this->relatedCacheKeysKey())));
 
-        $size += $this->index()->cacheSize();
-
-        return $size;
+        return $size + $this->index()->cacheSize();
     }
 
     protected function cacheTtl(): CarbonInterface

@@ -8,7 +8,7 @@ use ArchiElite\LogViewer\Exceptions\CannotOpenFileException;
 trait KeepsFileHandle
 {
     /** @var resource|null */
-    protected $fileHandle = null;
+    protected $fileHandle;
 
     protected function isFileOpen(): bool
     {
