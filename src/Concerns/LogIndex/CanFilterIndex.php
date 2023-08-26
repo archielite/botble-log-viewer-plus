@@ -2,7 +2,6 @@
 
 namespace ArchiElite\LogViewer\Concerns\LogIndex;
 
-use ArchiElite\LogViewer\Level;
 use Carbon\CarbonInterface;
 
 trait CanFilterIndex
@@ -60,7 +59,7 @@ trait CanFilterIndex
         if (is_array($levels)) {
             $this->includeLevels = array_filter($levels);
         } else {
-            $this->filterLevels = null;
+            $this->includeLevels = null;
         }
 
         return $this;

@@ -4,6 +4,9 @@ namespace ArchiElite\LogViewer;
 
 use ArchiElite\LogViewer\Collections\LogFileCollection;
 use ArchiElite\LogViewer\Collections\LogFolderCollection;
+use ArchiElite\LogViewer\Readers\IndexedLogReader;
+use ArchiElite\LogViewer\Readers\LogReaderInterface;
+use ArchiElite\LogViewer\Utils\Utils;
 use GuzzleHttp\Client;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Arr;
@@ -17,6 +20,10 @@ class LogViewerService
 {
     public const DEFAULT_MAX_LOG_SIZE_TO_DISPLAY = 131_072;    // 128 KB
 
+    public static string $logFileClass = LogFile::class;
+
+    public static string $logReaderClass = IndexedLogReader::class;
+
     protected ?Collection $_cachedFiles = null;
 
     protected mixed $authCallback;
@@ -25,7 +32,9 @@ class LogViewerService
 
     protected mixed $hostsResolver;
 
-    protected function getFilePaths(): array
+    protected string $layout = 'plugins/log-viewer-plus::index';
+
+    protected function getLaravelLogFilePaths(): array
     {
         if (PHP_OS_FAMILY === 'Windows') {
             $baseDir = str_replace(
@@ -72,7 +81,11 @@ class LogViewerService
 
     protected function getFilePathsMatchingPattern($pattern): array|false
     {
-        return glob($pattern);
+        if (str_contains($pattern, '**')) {
+            return Utils::glob_recursive($pattern);
+        }
+
+        return glob($pattern) ?: [];
     }
 
     public function basePathForLogs(): string
@@ -83,10 +96,18 @@ class LogViewerService
     public function getFiles(): LogFileCollection
     {
         if (! isset($this->_cachedFiles)) {
-            $this->_cachedFiles = (new LogFileCollection($this->getFilePaths()))
+            $fileClass = static::$logFileClass;
+
+            $this->_cachedFiles = (new LogFileCollection($this->getLaravelLogFilePaths()))
                 ->unique()
-                ->map(fn ($filePath) => new LogFile($filePath))
+                ->map(fn ($filePath) => new $fileClass($filePath))
                 ->values();
+        }
+
+        if (config('log-viewer.hide_unknown_files', true)) {
+            $this->_cachedFiles = $this->_cachedFiles->filter(function (LogFile $file) {
+                return ! $file->type()->isUnknown();
+            });
         }
 
         return $this->_cachedFiles;
@@ -203,19 +224,54 @@ class LogViewerService
         return $this->maxLogSizeToDisplay;
     }
 
+    public function lazyScanTimeout(): float
+    {
+        return 5.0;
+    }
+
     public function setMaxLogSize(int $bytes): void
     {
         $this->maxLogSizeToDisplay = $bytes > 0 ? $bytes : self::DEFAULT_MAX_LOG_SIZE_TO_DISPLAY;
     }
 
-    public function laravelRegexPattern(): string
+    public function extend(string $type, string $class): void
     {
-        return config('plugins.log-viewer-plus.log-viewer.patterns.laravel.log_parsing_regex');
+        app(LogTypeRegistrar::class)->register($type, $class);
     }
 
-    public function logMatchPattern(): string
+    public function useLogFileClass(string $class): void
     {
-        return config('plugins.log-viewer-plus.log-viewer.patterns.laravel.log_matching_regex');
+        if (! is_subclass_of($class, LogFile::class)) {
+            throw new \InvalidArgumentException("The class {$class} must extend from the " . LogFile::class . ' class.');
+        }
+
+        static::$logFileClass = $class;
+    }
+
+    public function useLogReaderClass(string $class): void
+    {
+        $reflection = new \ReflectionClass($class);
+
+        if (! $reflection->implementsInterface(LogReaderInterface::class)) {
+            throw new \InvalidArgumentException("The class {$class} must implement the LogReaderInterface.");
+        }
+
+        static::$logReaderClass = $class;
+    }
+
+    public function logReaderClass(): string
+    {
+        return static::$logReaderClass;
+    }
+
+    public function setViewLayout(string $layout): void
+    {
+        $this->layout = $layout;
+    }
+
+    public function getViewLayout(): string
+    {
+        return $this->layout;
     }
 
     public function version(): string

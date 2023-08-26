@@ -2,14 +2,22 @@
 
 namespace ArchiElite\LogViewer\Http\Resources;
 
+use ArchiElite\LogViewer\LogFile;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @mixin LogFile
+ */
 class LogFileResource extends JsonResource
 {
     public function toArray($request): array
     {
         return [
+            'type' => [
+                'value' => $this->type()->value,
+                'name' => $this->type()->name(),
+            ],
             'identifier' => $this->identifier,
             'sub_folder' => $this->subFolder,
             'sub_folder_identifier' => $this->subFolderIdentifier(),

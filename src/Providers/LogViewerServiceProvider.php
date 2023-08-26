@@ -1,8 +1,12 @@
 <?php
 
+/** @noinspection PhpUndefinedNamespaceInspection */
+/** @noinspection PhpUndefinedClassInspection */
+
 namespace ArchiElite\LogViewer\Providers;
 
 use ArchiElite\LogViewer\Commands\GenerateDummyLogsCommand;
+use ArchiElite\LogViewer\LogTypeRegistrar;
 use ArchiElite\LogViewer\LogViewerService;
 use Botble\Base\Facades\DashboardMenu;
 use Botble\Base\Supports\ServiceProvider;
@@ -20,6 +24,12 @@ class LogViewerServiceProvider extends ServiceProvider
         $this->app->bind('log-viewer-cache', function () {
             return Cache::driver(config('plugins.log-viewer-plus.log-viewer.cache_driver'));
         });
+
+        if (! $this->app->bound(LogTypeRegistrar::class)) {
+            $this->app->singleton(LogTypeRegistrar::class, function () {
+                return new LogTypeRegistrar();
+            });
+        }
     }
 
     public function boot(): void

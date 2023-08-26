@@ -201,7 +201,6 @@ export const useLogViewerStore = defineStore({
                 query: searchStore.query,
                 page: paginationStore.currentPage,
                 per_page: this.resultsPerPage,
-                levels: toRaw(severityStore.selectedLevels.length > 0 ? severityStore.selectedLevels : 'none'),
                 exclude_levels: toRaw(severityStore.excludedLevels.length > 0 ? severityStore.excludedLevels : ''),
                 exclude_file_types: toRaw(fileStore.fileTypesExcluded.length > 0 ? fileStore.fileTypesExcluded : ''),
                 shorter_stack_traces: this.shorterStackTraces,
@@ -229,7 +228,7 @@ export const useLogViewerStore = defineStore({
                         this.logs = data.logs
                     }
                     this.hasMoreResults = data.hasMoreResults
-                    this.columns = data.columns || defaultColumns;
+                    this.columns = data.columns || defaultColumns
                     this.percentScanned = data.percentScanned
                     this.error = data.error || null
                     this.performance = data.performance || {}

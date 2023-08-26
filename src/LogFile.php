@@ -3,6 +3,11 @@
 namespace ArchiElite\LogViewer;
 
 use ArchiElite\LogViewer\Events\LogFileDeleted;
+
+use ArchiElite\LogViewer\Exceptions\CannotOpenFileException;
+use ArchiElite\LogViewer\Facades\LogViewer;
+use ArchiElite\LogViewer\Logs\LogType;
+use ArchiElite\LogViewer\Readers\LogReaderInterface;
 use ArchiElite\LogViewer\Utils\Utils;
 use Illuminate\Support\Arr;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -12,8 +17,6 @@ class LogFile
     use Concerns\LogFile\HasMetadata;
     use Concerns\LogFile\CanCacheData;
 
-    public string $path;
-
     public string $name;
 
     public string $identifier;
@@ -22,9 +25,8 @@ class LogFile
 
     private array $logIndexCache;
 
-    public function __construct(string $path)
+    public function __construct(public string $path, protected ?string $type = null)
     {
-        $this->path = $path;
         $this->name = basename($path);
         $this->identifier = Utils::shortMd5($path) . '-' . $this->name;
 
@@ -32,6 +34,26 @@ class LogFile
         $this->subFolder = rtrim($this->subFolder, DIRECTORY_SEPARATOR);
 
         $this->loadMetadata();
+    }
+
+    public function type(): LogType
+    {
+        if (is_null($this->type)) {
+            $this->type = $this->getMetadata('type');
+        }
+
+        if (is_null($this->type)) {
+            $this->type = app(LogTypeRegistrar::class)->guessTypeFromFileName($this);
+
+            if (is_null($this->type)) {
+                $this->type = app(LogTypeRegistrar::class)->guessTypeFromFirstLine($this);
+            }
+
+            $this->setMetadata('type', $this->type);
+            $this->saveMetadata();
+        }
+
+        return new LogType($this->type ?? LogType::DEFAULT);
     }
 
     public function index(string $query = null): LogIndex
@@ -43,9 +65,11 @@ class LogFile
         return $this->logIndexCache[$query];
     }
 
-    public function logs(): LogReader
+    public function logs(): LogReaderInterface
     {
-        return LogReader::instance($this);
+        $logReaderClass = LogViewer::logReaderClass();
+
+        return $logReaderClass::instance($this);
     }
 
     public function size(): int
@@ -78,6 +102,33 @@ class LogFile
     public function download(): BinaryFileResponse
     {
         return response()->download($this->path);
+    }
+
+    public function contents(): string
+    {
+        return file_get_contents($this->path);
+    }
+
+    public function getFirstLine(): string
+    {
+        return $this->getNthLine(1);
+    }
+
+    public function getNthLine(int $lineNumber): string
+    {
+        try {
+            $handle = fopen($this->path, 'r');
+        } catch (\ErrorException $e) {
+            throw new CannotOpenFileException('Could not open "' . $this->path . '" for reading.', 0, $e);
+        }
+
+        $line = '';
+        for ($i = 0; $i < $lineNumber; $i++) {
+            $line = fgets($handle);
+        }
+        fclose($handle);
+
+        return $line;
     }
 
     public function addRelatedIndex(LogIndex $logIndex): void
@@ -127,7 +178,7 @@ class LogFile
         return $this->logs()->requiresScan();
     }
 
-    public function search(string $query = null): LogReader
+    public function search(string $query = null): LogReaderInterface
     {
         return $this->logs()->search($query);
     }

@@ -6,12 +6,12 @@
         </MenuButton>
 
         <transition
-            leave-active-class="transition ease-in duration-100"
-            leave-from-class="opacity-100 scale-100"
-            leave-to-class="opacity-0 scale-90"
-            enter-active-class="transition ease-out duration-100"
-            enter-from-class="opacity-0 scale-90"
-            enter-to-class="opacity-100 scale-100"
+            leave-active-class="transition duration-100 ease-in"
+            leave-from-class="scale-100 opacity-100"
+            leave-to-class="scale-90 opacity-0"
+            enter-active-class="transition duration-100 ease-out"
+            enter-from-class="scale-90 opacity-0"
+            enter-to-class="scale-100 opacity-100"
         >
             <MenuItems as="div" style="min-width: 250px" class="dropdown">
                 <div class="py-2">
@@ -74,7 +74,7 @@
 
                     <MenuItem v-slot="{ active }">
                         <a
-                            href="https://github.com/archielite/log-viewer"
+                            href="https://github.com/archielite/log-viewer-plus"
                             target="_blank"
                             :class="[active ? 'active' : '']"
                         >

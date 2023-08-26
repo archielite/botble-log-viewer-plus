@@ -93,8 +93,8 @@
 <script setup>
 import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { replaceQuery } from '../helpers.js';
-import { ArrowPathIcon, Bars3Icon } from '@heroicons/vue/24/solid';
+import { replaceQuery } from '../helpers.js'
+import { ArrowPathIcon, Bars3Icon } from '@heroicons/vue/24/solid'
 import { useLogViewerStore } from '../stores/logViewer.js'
 import { useSearchStore } from '../stores/search.js'
 import { useFileStore } from '../stores/files.js'
@@ -104,8 +104,8 @@ import LevelButtons from './LevelButtons.vue'
 import SearchInput from './SearchInput.vue'
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue'
 import SpinnerIcon from './SpinnerIcon.vue'
-import BaseLogTable from './BaseLogTable.vue';
-import { useSeverityStore } from '../stores/severity.js';
+import BaseLogTable from './BaseLogTable.vue'
+import { useSeverityStore } from '../stores/severity.js'
 
 const router = useRouter()
 const fileStore = useFileStore()

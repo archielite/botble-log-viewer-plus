@@ -3,9 +3,12 @@
 namespace ArchiElite\LogViewer\Collections;
 
 use ArchiElite\LogViewer\LogFile;
-use ArchiElite\LogViewer\MultipleLogReader;
+use ArchiElite\LogViewer\Readers\MultipleLogReader;
 use Illuminate\Support\Collection;
 
+/**
+ * @var LogFile[] $items
+ */
 class LogFileCollection extends Collection
 {
     public function sortByEarliestFirst(): self

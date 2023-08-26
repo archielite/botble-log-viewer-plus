@@ -11,7 +11,7 @@ class LogViewerController extends BaseController
 {
     public function __invoke(): View
     {
-        return view('plugins/log-viewer-plus::index', [
+        return view(LogViewer::getViewLayout(), [
             'logViewerScriptVariables' => [
                 'headers' => (object) [],
                 'version' => LogViewer::version(),

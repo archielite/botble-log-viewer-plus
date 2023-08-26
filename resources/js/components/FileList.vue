@@ -8,7 +8,7 @@
                     </router-link>
 
                     <a
-                        href="https://github.com/archielite/log-viewer"
+                        href="https://github.com/archielite/log-viewer-plus"
                         target="_blank"
                         class="p-1 ml-3 text-gray-400 rounded hover:text-brand-800 dark:hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700"
                     >
@@ -287,7 +287,7 @@ import SpinnerIcon from './SpinnerIcon.vue'
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue'
 import HostSelector from './HostSelector.vue'
 import { handleKeyboardFileNavigation, handleKeyboardFileSettingsNavigation } from '../keyboardNavigation'
-import FileTypeSelector from './FileTypeSelector.vue';
+import FileTypeSelector from './FileTypeSelector.vue'
 
 const router = useRouter()
 const route = useRoute()

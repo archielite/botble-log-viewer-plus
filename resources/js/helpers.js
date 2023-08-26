@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 
 export const highlightSearchResult = (text, query = null) => {
-    text = text || '';
+    text = text || ''
 
     if (query) {
         try {
