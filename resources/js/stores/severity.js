@@ -1,26 +1,12 @@
 import { defineStore } from 'pinia'
 import { useLocalStorage } from '@vueuse/core'
 
-const DefaultSeverities = [
-    'debug',
-    'info',
-    'notice',
-    'warning',
-    'error',
-    'critical',
-    'alert',
-    'emergency',
-    'processing',
-    'processed',
-    'failed',
-    '',
-]
-
 export const useSeverityStore = defineStore({
     id: 'severity',
 
     state: () => ({
-        selectedLevels: useLocalStorage('selectedLevels', DefaultSeverities),
+        allLevels: [],
+        excludedLevels: useLocalStorage('excludedLevels', []),
         levelCounts: [],
     }),
 
@@ -47,10 +33,12 @@ export const useSeverityStore = defineStore({
             } else {
                 this.levelCounts = Object.values(levelCounts)
             }
+
+            this.allLevels = levelCounts.map((levelCount) => levelCount.level)
         },
 
         selectAllLevels() {
-            this.selectedLevels = DefaultSeverities
+            this.excludedLevels = []
             this.levelCounts.forEach((levelCount) => (levelCount.selected = true))
         },
 
@@ -62,12 +50,12 @@ export const useSeverityStore = defineStore({
         toggleLevel(level) {
             const levelCount = this.levelCounts.find((levelCount) => levelCount.level === level) || {}
 
-            if (this.selectedLevels.includes(level)) {
-                this.selectedLevels = this.selectedLevels.filter((selectedLevel) => selectedLevel !== level)
-                levelCount.selected = false
-            } else {
-                this.selectedLevels.push(level)
+            if (this.excludedLevels.includes(level)) {
+                this.excludedLevels = this.excludedLevels.filter((excludedLevel) => excludedLevel !== level)
                 levelCount.selected = true
+            } else {
+                this.excludedLevels.push(level)
+                levelCount.selected = false
             }
         },
     },

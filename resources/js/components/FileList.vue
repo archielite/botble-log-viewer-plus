@@ -1,20 +1,20 @@
 <template>
     <nav class="flex flex-col h-full py-5">
-        <div class="mx-3 md:mx-0 mb-1">
+        <div class="mx-3 mb-1 md:mx-0">
             <div class="sm:flex sm:flex-col-reverse">
                 <div class="flex items-center">
                     <router-link to="">
-                        <h1 class="font-semibold text-brand-700 dark:text-brand-600 text-2xl">Log Viewer</h1>
+                        <h1 class="text-2xl font-semibold text-brand-700 dark:text-brand-600">Log Viewer</h1>
                     </router-link>
 
                     <a
                         href="https://github.com/archielite/log-viewer"
                         target="_blank"
-                        class="rounded ml-3 text-gray-400 hover:text-brand-800 dark:hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700 p-1"
+                        class="p-1 ml-3 text-gray-400 rounded hover:text-brand-800 dark:hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5"
+                            class="w-5 h-5"
                             viewBox="0 0 24 24"
                             fill="currentColor"
                             title=""
@@ -24,7 +24,7 @@
                             ></path>
                         </svg>
                     </a>
-                    <span class="md:hidden flex-1 flex justify-end">
+                    <span class="flex justify-end flex-1 md:hidden">
                         <SiteSettingsDropdown class="ml-2" />
                         <button type="button" class="menu-button">
                             <XMarkIcon class="w-5 h-5 ml-2" @click="fileStore.toggleSidebar" />
@@ -35,7 +35,7 @@
                 <div v-if="LogViewer.back_to_system_url">
                     <a
                         :href="LogViewer.back_to_system_url"
-                        class="rounded shrink inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-brand-800 dark:hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700 mt-0"
+                        class="inline-flex items-center mt-0 text-sm text-gray-500 rounded shrink dark:text-gray-400 hover:text-brand-800 dark:hover:text-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-700"
                     >
                         <ArrowLeftIcon class="h-3 w-3 mr-1.5" />
                         {{ `Back to ${LogViewer.app_name}` }}
@@ -44,11 +44,15 @@
             </div>
 
             <template v-if="hostStore.supportsHosts && hostStore.hasRemoteHosts">
-                <host-selector class="mb-8 mt-6" />
+                <host-selector class="mt-6 mb-8" />
             </template>
 
-            <div class="flex justify-between items-baseline mt-6" v-if="fileStore.folders?.length > 0">
-                <div class="ml-1 block text-sm text-gray-500 dark:text-gray-400 truncate">
+            <template v-if="fileStore.fileTypesAvailable && fileStore.fileTypesAvailable.length > 1">
+                <file-type-selector class="mt-6 mb-8" />
+            </template>
+
+            <div class="flex items-baseline justify-between mt-6" v-if="fileStore.filteredFolders?.length > 0">
+                <div class="block ml-1 text-sm text-gray-500 truncate dark:text-gray-400">
                     Log files on
                     {{ fileStore.selectedHost?.name }}
                 </div>
@@ -61,7 +65,7 @@
                 </div>
             </div>
 
-            <p v-if="fileStore.error" class="mx-1 mt-1 text-red-600 text-xs">
+            <p v-if="fileStore.error" class="mx-1 mt-1 text-xs text-red-600">
                 {{ fileStore.error }}
             </p>
         </div>
@@ -77,12 +81,12 @@
                 <button
                     v-show="fileStore.hasFilesChecked"
                     @click.stop="confirmDeleteSelectedFiles"
-                    class="button inline-flex"
+                    class="inline-flex button"
                 >
                     <TrashIcon class="w-5 mr-1" />
                     Delete selected files
                 </button>
-                <button class="button inline-flex" @click.stop="fileStore.resetChecks()">
+                <button class="inline-flex button" @click.stop="fileStore.resetChecks()">
                     Cancel
                     <XMarkIcon class="w-5 ml-1" />
                 </button>
@@ -92,7 +96,7 @@
         <div id="file-list-container" class="relative h-full overflow-hidden">
             <div class="file-list" @scroll="(event) => fileStore.onScroll(event)">
                 <div
-                    v-for="folder in fileStore.folders"
+                    v-for="folder in fileStore.filteredFolders"
                     :key="folder.identifier"
                     :id="`folder-${folder.identifier}`"
                     class="relative folder-container"
@@ -114,7 +118,7 @@
                                         <FolderIcon v-show="!fileStore.isOpen(folder)" class="w-5 h-5" />
                                         <FolderOpenIcon v-show="fileStore.isOpen(folder)" class="w-5 h-5" />
                                     </span>
-                                    <span class="file-icon hidden group-hover:inline-block group-focus:inline-block">
+                                    <span class="hidden file-icon group-hover:inline-block group-focus:inline-block">
                                         <ChevronRightIcon
                                             :class="[
                                                 fileStore.isOpen(folder) ? 'rotate-90' : '',
@@ -144,18 +148,18 @@
                             </div>
 
                             <transition
-                                leave-active-class="transition ease-in duration-100"
-                                leave-from-class="opacity-100 scale-100"
-                                leave-to-class="opacity-0 scale-90"
-                                enter-active-class="transition ease-out duration-100"
-                                enter-from-class="opacity-0 scale-90"
-                                enter-to-class="opacity-100 scale-100"
+                                leave-active-class="transition duration-100 ease-in"
+                                leave-from-class="scale-100 opacity-100"
+                                leave-to-class="scale-90 opacity-0"
+                                enter-active-class="transition duration-100 ease-out"
+                                enter-from-class="scale-90 opacity-0"
+                                enter-to-class="scale-100 opacity-100"
                             >
                                 <MenuItems
                                     static
                                     v-show="open"
                                     as="div"
-                                    class="dropdown w-48"
+                                    class="w-48 dropdown"
                                     :class="[dropdownDirections[folder.identifier]]"
                                 >
                                     <div class="py-2">
@@ -230,7 +234,7 @@
                     </Menu>
 
                     <div
-                        class="folder-files pl-3 ml-1 border-l border-gray-200 dark:border-gray-800"
+                        class="pl-3 ml-1 border-l border-gray-200 folder-files dark:border-gray-800"
                         v-show="fileStore.isOpen(folder)"
                     >
                         <file-list-item
@@ -243,15 +247,13 @@
                 </div>
             </div>
 
-            <!-- gradient to hide the bottom of the file list -->
             <div
-                class="pointer-events-none absolute z-10 bottom-0 h-4 w-full bg-gradient-to-t from-gray-100 dark:from-gray-900 to-transparent"
+                class="absolute bottom-0 z-10 w-full h-4 pointer-events-none bg-gradient-to-t from-gray-100 dark:from-gray-900 to-transparent"
             ></div>
 
-            <!-- loading state overlay -->
-            <div class="absolute inset-y-0 left-3 right-7 lg:left-0 lg:right-0 z-10" v-show="fileStore.loading">
+            <div class="absolute inset-y-0 z-10 left-3 right-7 lg:left-0 lg:right-0" v-show="fileStore.loading">
                 <div
-                    class="rounded-md bg-white text-gray-800 dark:bg-gray-700 dark:text-gray-200 opacity-90 w-full h-full flex items-center justify-center"
+                    class="flex items-center justify-center w-full h-full text-gray-800 bg-white rounded-md dark:bg-gray-700 dark:text-gray-200 opacity-90"
                 >
                     <SpinnerIcon class="w-14 h-14" />
                 </div>
@@ -285,6 +287,7 @@ import SpinnerIcon from './SpinnerIcon.vue'
 import SiteSettingsDropdown from './SiteSettingsDropdown.vue'
 import HostSelector from './HostSelector.vue'
 import { handleKeyboardFileNavigation, handleKeyboardFileSettingsNavigation } from '../keyboardNavigation'
+import FileTypeSelector from './FileTypeSelector.vue';
 
 const router = useRouter()
 const route = useRoute()

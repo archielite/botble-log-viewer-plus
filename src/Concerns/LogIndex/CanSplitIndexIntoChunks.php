@@ -89,7 +89,7 @@ trait CanSplitIndexIntoChunks
         $relevantItemsInChunk = 0;
 
         foreach ($chunkDefinition['level_counts'] as $level => $count) {
-            if (! isset($this->filterLevels) || in_array($level, $this->filterLevels)) {
+            if ($this->isLevelSelected($level)) {
                 $relevantItemsInChunk += $count;
             }
         }
