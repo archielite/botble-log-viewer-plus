@@ -7,7 +7,7 @@ use ArchiElite\LogViewer\LogLevels\LaravelLogLevel;
 use ArchiElite\LogViewer\Utils\Utils;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
-use Opcodes\MailParser\Message;
+use ArchiElite\LogViewer\MailParser\Message;
 
 class LaravelLog extends Log
 {
@@ -36,8 +36,6 @@ class LaravelLog extends Log
 
         [$firstLine, $theRestOfIt] = explode("\n", Str::finish($this->text, "\n"), 2);
 
-        // sometimes, even the first line will have a HUGE exception with tons of debug data all in one line,
-        // so in order to properly match, we must have a smaller first line...
         $firstLineSplit = str_split($firstLine, 1000);
 
         preg_match(static::regexPattern(), array_shift($firstLineSplit), $matches);
@@ -46,13 +44,8 @@ class LaravelLog extends Log
             config('log-viewer.timezone', config('app.timezone', 'UTC'))
         );
 
-        // $matches[2] contains microseconds, which is already handled
-        // $matches[3] contains timezone offset, which is already handled
-
         $this->extra['environment'] = $matches[5] ?? null;
 
-        // There might be something in the middle between the timestamp
-        // and the environment/level. Let's put that at the beginning of the first line.
         $middle = trim(rtrim($matches[4] ?? '', $this->extra['environment'] . '.'));
 
         $this->level = strtoupper($matches[6] ?? '');
@@ -124,13 +117,10 @@ class LaravelLog extends Log
             return;
         }
 
-        // Loop through the matches.
         foreach ($matches[0] as $json_string) {
-            // Try to decode the JSON string. If it fails, json_last_error() will return a non-zero value.
             $json_data = json_decode(trim($json_string), true);
 
             if (json_last_error() == JSON_ERROR_CTRL_CHAR) {
-                // might need to escape new lines
                 $json_data = json_decode(str_replace("\n", '\\n', $json_string), true);
             }
 
