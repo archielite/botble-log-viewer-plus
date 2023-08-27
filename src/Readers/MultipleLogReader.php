@@ -1,8 +1,14 @@
 <?php
 
-namespace ArchiElite\LogViewer;
+namespace ArchiElite\LogViewer\Readers;
 
 use ArchiElite\LogViewer\Collections\LogFileCollection;
+use ArchiElite\LogViewer\Direction;
+use ArchiElite\LogViewer\Exceptions\CannotOpenFileException;
+use ArchiElite\LogViewer\Facades\LogViewer;
+use ArchiElite\LogViewer\LevelCount;
+use ArchiElite\LogViewer\LogFile;
+use ArchiElite\LogViewer\Logs\Log;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 
@@ -18,7 +24,7 @@ class MultipleLogReader
 
     protected string $direction;
 
-    protected ?array $levels = null;
+    protected ?array $exceptLevels = null;
 
     public function __construct(mixed $files)
     {
@@ -33,16 +39,16 @@ class MultipleLogReader
         $this->setDirection(Direction::Forward);
     }
 
-    public function setLevels($levels = null): self
+    public function exceptLevels($levels = null): self
     {
-        $this->levels = $levels;
+        $this->exceptLevels = $levels;
 
         return $this;
     }
 
     public function allLevels(): self
     {
-        $this->levels = null;
+        $this->exceptLevels = null;
 
         return $this;
     }
@@ -115,9 +121,7 @@ class MultipleLogReader
 
     public function total(): int
     {
-        return $this->fileCollection->sum(function (LogFile $file) {
-            return $this->getLogQueryForFile($file)->total();
-        });
+        return $this->fileCollection->sum(fn (LogFile $file) => $this->getLogQueryForFile($file)->total());
     }
 
     public function paginate($perPage = 25, int $page = null): LengthAwarePaginator
@@ -134,10 +138,15 @@ class MultipleLogReader
         );
     }
 
+    /**
+     * Get the logs from this file collection.
+     *
+     * @return array|Log[]
+     */
     public function get(int $limit = null): array
     {
         $skip = $this->skip ?? null;
-        $limit = $limit ?? $this->limit ?? null;
+        $limit ??= $this->limit ?? null;
         $logs = [];
 
         /** @var LogFile $file */
@@ -159,6 +168,7 @@ class MultipleLogReader
             }
 
             if (isset($limit) && $limit <= 0) {
+                // we've gotten the required amount of logs! exit early
                 break;
             }
         }
@@ -168,9 +178,7 @@ class MultipleLogReader
 
     public function requiresScan(): bool
     {
-        return $this->fileCollection->some(function (LogFile $file) {
-            return $this->getLogQueryForFile($file)->requiresScan();
-        });
+        return $this->fileCollection->some(fn (LogFile $file) => $this->getLogQueryForFile($file)->requiresScan());
     }
 
     public function percentScanned(): int
@@ -182,9 +190,7 @@ class MultipleLogReader
             return 100;
         }
 
-        $missingScansBytes = $this->fileCollection->sum(function (LogFile $file) {
-            return $this->getLogQueryForFile($file)->numberOfNewBytes();
-        });
+        $missingScansBytes = $this->fileCollection->sum(fn (LogFile $file) => $this->getLogQueryForFile($file)->numberOfNewBytes());
 
         return 100 - intval($missingScansBytes / $totalFileBytes * 100);
     }
@@ -192,6 +198,7 @@ class MultipleLogReader
     public function scan(int $maxBytesToScan = null, bool $force = false): void
     {
         $fileSizeScanned = 0;
+        $stopScanningAfter = microtime(true) + LogViewer::lazyScanTimeout();
 
         /** @var LogFile $logFile */
         foreach ($this->fileCollection as $logFile) {
@@ -203,20 +210,28 @@ class MultipleLogReader
 
             $fileSizeScanned += $logQuery->numberOfNewBytes();
 
-            $logQuery->scan($maxBytesToScan, $force);
+            try {
+                $logQuery->scan($maxBytesToScan, $force);
+            } catch (CannotOpenFileException) {
+                continue;
+            }
 
             if (isset($maxBytesToScan) && $fileSizeScanned >= $maxBytesToScan) {
+                break;
+            }
+
+            if ($stopScanningAfter < microtime(true)) {
                 break;
             }
         }
     }
 
-    protected function getLogQueryForFile(LogFile $file): LogReader
+    protected function getLogQueryForFile(LogFile $file): LogReaderInterface
     {
         return $file->logs()
-            ->setQuery($this->query)
+            ->search($this->query)
             ->setDirection($this->direction)
-            ->setLevels($this->levels)
+            ->exceptLevels($this->exceptLevels)
             ->lazyScanning();
     }
 }

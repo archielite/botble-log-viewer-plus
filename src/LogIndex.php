@@ -15,7 +15,7 @@ class LogIndex
     use Concerns\LogIndex\CanSplitIndexIntoChunks;
     use Concerns\LogIndex\PreservesIndexingProgress;
 
-    public const DEFAULT_CHUNK_SIZE = 20_000;
+    public const DEFAULT_CHUNK_SIZE = 50_000;
 
     public string $identifier;
 
@@ -80,7 +80,7 @@ class LogIndex
     {
         $results = [];
         $itemsAdded = 0;
-        $limit = $limit ?? $this->limit;
+        $limit ??= $this->limit;
         $skip = $this->skip;
         $chunkDefinitions = $this->getChunkDefinitions();
 
@@ -109,6 +109,7 @@ class LogIndex
                 if (isset($this->filterFrom) && $timestamp < $this->filterFrom) {
                     continue;
                 }
+
                 if (isset($this->filterTo) && $timestamp > $this->filterTo) {
                     continue;
                 }
@@ -119,7 +120,7 @@ class LogIndex
                 }
 
                 foreach ($tsIndex as $level => $levelIndex) {
-                    if (isset($this->filterLevels) && ! in_array($level, $this->filterLevels)) {
+                    if (! $this->isLevelSelected($level)) {
                         continue;
                     }
 
@@ -132,7 +133,7 @@ class LogIndex
 
                     foreach ($levelIndex as $idx => $position) {
                         if ($skip > 0) {
-                            $skip--;
+                            --$skip;
 
                             continue;
                         }
@@ -162,7 +163,7 @@ class LogIndex
     {
         $results = [];
         $itemsAdded = 0;
-        $limit = $limit ?? $this->limit;
+        $limit ??= $this->limit;
         $skip = $this->skip;
         $chunkDefinitions = $this->getChunkDefinitions();
 
@@ -191,6 +192,7 @@ class LogIndex
                 if (isset($this->filterFrom) && $timestamp < $this->filterFrom) {
                     continue;
                 }
+
                 if (isset($this->filterTo) && $timestamp > $this->filterTo) {
                     continue;
                 }
@@ -198,7 +200,7 @@ class LogIndex
                 $itemsWithinThisTimestamp = [];
 
                 foreach ($tsIndex as $level => $levelIndex) {
-                    if (isset($this->filterLevels) && ! in_array($level, $this->filterLevels)) {
+                    if (! $this->isLevelSelected($level)) {
                         continue;
                     }
 
@@ -211,7 +213,7 @@ class LogIndex
 
                 foreach ($itemsWithinThisTimestamp as $idx => $filePosition) {
                     if ($skip > 0) {
-                        $skip--;
+                        --$skip;
 
                         continue;
                     }
@@ -239,19 +241,27 @@ class LogIndex
 
     public function getLevelCounts(): Collection
     {
-        $counts = collect(Level::caseValues())->mapWithKeys(fn ($case) => [$case => 0]);
+        $counts = collect([]);
 
         if (! $this->hasDateFilters()) {
             // without date filters, we can use a faster approach
             foreach ($this->getChunkDefinitions() as $chunkDefinition) {
                 foreach ($chunkDefinition['level_counts'] as $severity => $count) {
+                    if (! $counts->has($severity)) {
+                        $counts[$severity] = 0;
+                    }
+
                     $counts[$severity] += $count;
                 }
             }
         } else {
-            foreach ($this->get() as $timestamp => $tsIndex) {
+            foreach ($this->get() as $tsIndex) {
                 foreach ($tsIndex as $severity => $logIndex) {
-                    $counts[$severity] += count($logIndex);
+                    if (! $counts->has($severity)) {
+                        $counts[$severity] = 0;
+                    }
+
+                    $counts[$severity] += is_countable($logIndex) ? count($logIndex) : 0;
                 }
             }
         }
@@ -259,19 +269,11 @@ class LogIndex
         return $counts;
     }
 
-    /**
-     * @deprecated Will be removed in v2.0. Please use LogIndex::count()
-     */
-    public function total(): int
-    {
-        return $this->count();
-    }
-
     public function count(): int
     {
         return array_reduce($this->getChunkDefinitions(), function ($sum, $chunkDefinition) {
             foreach ($chunkDefinition['level_counts'] as $level => $count) {
-                if (! isset($this->filterLevels) || in_array($level, $this->filterLevels)) {
+                if ($this->isLevelSelected($level)) {
                     $sum += $count;
                 }
             }

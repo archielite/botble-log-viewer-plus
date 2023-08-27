@@ -27,9 +27,7 @@ class EnsureFrontendRequestsAreStateful
             AddQueuedCookiesToResponse::class,
             StartSession::class,
             config('sanctum.middleware.verify_csrf_token', VerifyCsrfToken::class),
-        ] : [])->then(function ($request) use ($next) {
-            return $next($request);
-        });
+        ] : [])->then(fn ($request) => $next($request));
     }
 
     protected function configureSecureCookieSessions(): void
@@ -54,9 +52,7 @@ class EnsureFrontendRequestsAreStateful
 
         $stateful = array_filter(config('sanctum.stateful', self::defaultStatefulDomains()));
 
-        return Str::is(Collection::make($stateful)->map(function ($uri) {
-            return trim($uri) . '/*';
-        })->all(), $domain);
+        return Str::is(Collection::make($stateful)->map(fn ($uri) => trim($uri) . '/*')->all(), $domain);
     }
 
     protected static function defaultStatefulDomains(): array

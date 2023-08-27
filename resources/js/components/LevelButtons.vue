@@ -1,6 +1,6 @@
 <template>
     <div class="flex items-center">
-        <Menu as="div" class="mr-5 relative log-levels-selector">
+        <Menu as="div" class="relative mr-5 log-levels-selector">
             <MenuButton
                 as="button"
                 id="severity-dropdown-toggle"
@@ -8,7 +8,7 @@
                 :class="severityStore.levelsSelected.length > 0 ? 'active' : ''"
             >
                 <template v-if="severityStore.levelsSelected.length > 2">
-                    <span class="opacity-90 mr-1"
+                    <span class="mr-1 opacity-90"
                         >{{
                             severityStore.totalResultsSelected.toLocaleString() +
                             (logViewerStore.hasMoreResults ? '+' : '')
@@ -21,7 +21,7 @@
                     >
                 </template>
                 <template v-else-if="severityStore.levelsSelected.length > 0">
-                    <span class="opacity-90 mr-1"
+                    <span class="mr-1 opacity-90"
                         >{{
                             severityStore.totalResultsSelected.toLocaleString() +
                             (logViewerStore.hasMoreResults ? '+' : '')
@@ -44,16 +44,16 @@
             </MenuButton>
 
             <transition
-                leave-active-class="transition ease-in duration-100"
-                leave-from-class="opacity-100 scale-100"
-                leave-to-class="opacity-0 scale-90"
-                enter-active-class="transition ease-out duration-100"
-                enter-from-class="opacity-0 scale-90"
-                enter-to-class="opacity-100 scale-100"
+                leave-active-class="transition duration-100 ease-in"
+                leave-from-class="scale-100 opacity-100"
+                leave-to-class="scale-90 opacity-0"
+                enter-active-class="transition duration-100 ease-out"
+                enter-from-class="scale-90 opacity-0"
+                enter-to-class="scale-100 opacity-100"
             >
                 <MenuItems as="div" class="dropdown down left min-w-[240px]">
                     <div class="py-2">
-                        <div class="label flex justify-between">
+                        <div class="flex justify-between label">
                             Severity
                             <template v-if="severityStore.levelsFound.length > 0">
                                 <MenuItem
@@ -62,7 +62,7 @@
                                     v-slot="{ active }"
                                 >
                                     <a
-                                        class="inline-link px-2 -mr-2 py-1 -my-1 rounded-md cursor-pointer text-brand-700 dark:text-brand-500 font-normal"
+                                        class="px-2 py-1 -my-1 -mr-2 font-normal rounded-md cursor-pointer inline-link text-brand-700 dark:text-brand-500"
                                         :class="[active ? 'active' : '']"
                                     >
                                         Deselect all
@@ -70,7 +70,7 @@
                                 </MenuItem>
                                 <MenuItem v-else @click.stop="severityStore.selectAllLevels" v-slot="{ active }">
                                     <a
-                                        class="inline-link px-2 -mr-2 py-1 -my-1 rounded-md cursor-pointer text-brand-700 dark:text-brand-500 font-normal"
+                                        class="px-2 py-1 -my-1 -mr-2 font-normal rounded-md cursor-pointer inline-link text-brand-700 dark:text-brand-500"
                                         :class="[active ? 'active' : '']"
                                     >
                                         Select all
@@ -93,7 +93,7 @@
                             >
                                 <button :class="[active ? 'active' : '']">
                                     <Checkmark class="checkmark mr-2.5" :checked="levelCount.selected" />
-                                    <span class="flex-1 inline-flex justify-between">
+                                    <span class="inline-flex justify-between flex-1">
                                         <span :class="['log-level', levelCount.level_class]">{{
                                             levelCount.level_name
                                         }}</span>
@@ -121,7 +121,7 @@ const logViewerStore = useLogViewerStore()
 const severityStore = useSeverityStore()
 
 watch(
-    () => severityStore.selectedLevels,
+    () => severityStore.excludedLevels,
     () => logViewerStore.loadLogs()
 )
 </script>
