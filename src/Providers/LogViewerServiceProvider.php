@@ -9,6 +9,10 @@ use ArchiElite\LogViewer\Commands\GenerateDummyLogsCommand;
 use ArchiElite\LogViewer\LogTypeRegistrar;
 use ArchiElite\LogViewer\LogViewerService;
 use Botble\Base\Facades\DashboardMenu;
+use Botble\Base\Facades\PanelSectionManager;
+use Botble\Base\PanelSections\Manager;
+use Botble\Base\PanelSections\PanelSectionItem;
+use Botble\Base\PanelSections\System\SystemPanelSection;
 use Botble\Base\Supports\ServiceProvider;
 use Botble\Base\Traits\LoadAndPublishDataTrait;
 use Illuminate\Routing\Events\RouteMatched;
@@ -43,16 +47,31 @@ class LogViewerServiceProvider extends ServiceProvider
             ]);
         }
 
-        $this->app['events']->listen(RouteMatched::class, function () {
-            DashboardMenu::registerItem([
-                'id' => 'cms-plugin-log-viewer',
-                'priority' => 7,
-                'parent_id' => 'cms-core-platform-administration',
-                'name' => 'plugins/log-viewer-plus::log-viewer.name',
-                'icon' => null,
-                'url' => route('log-viewer.index'),
-                'permissions' => ['log-viewer.index'],
-            ]);
-        });
+        if (version_compare('7.0.0', get_core_version(), '>=')) {
+            $this->app['events']->listen(RouteMatched::class, function () {
+                DashboardMenu::registerItem([
+                    'id' => 'cms-plugin-log-viewer',
+                    'priority' => 7,
+                    'parent_id' => 'cms-core-platform-administration',
+                    'name' => 'plugins/log-viewer-plus::log-viewer.name',
+                    'icon' => null,
+                    'url' => route('log-viewer.index'),
+                    'permissions' => ['log-viewer.index'],
+                ]);
+            });
+        } else {
+            PanelSectionManager::group('system')->beforeRendering(function (Manager $manager) {
+                $manager
+                    ->registerItem(
+                        SystemPanelSection::class,
+                        fn() => PanelSectionItem::make('system.log-viewer')
+                            ->setTitle(trans('plugins/log-viewer-plus::log-viewer.name'))
+                            ->withDescription(trans('plugins/log-viewer-plus::log-viewer.description'))
+                            ->withIcon('ti ti-report')
+                            ->withPriority(9990)
+                            ->withRoute('log-viewer.index')
+                    );
+            });
+        }
     }
 }
