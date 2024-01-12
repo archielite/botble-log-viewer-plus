@@ -271,7 +271,7 @@ class LogViewerService
     public function version(): string
     {
         return Cache::remember('log-viewer-version', 60 * 60 * 24, function () {
-            $content = File::get(plugin_path('log-viewer-plus/plugin.json'));
+            $content = File::get(__DIR__ . '/../plugin.json');
 
             $content = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
